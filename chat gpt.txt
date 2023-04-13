@@ -1,0 +1,29 @@
+To validate if a Java-RMI port is vulnerable to the RMI Classloader Vulnerability, you can use a custom Java code similar to the one used by the "rmi-vuln-classloader.nse" Nmap NSE script. Here's how you can do it:
+
+First, create a Java file (let's call it "RMIVulnerabilityChecker.java") and add the following code to it:
+
+javaCopy code
+
+import java.net.*; import java.rmi.*; import java.rmi.server.*; import java.rmi.registry.*; import java.io.*; import java.util.*; public class RMIVulnerabilityChecker {    public static void main(String[] args) throws Exception {        // The IP address and port number of the target RMI service        String targetIp = "TARGET_IP_ADDRESS";        int targetPort = TARGET_PORT_NUMBER;        // The name of the remote object that we want to access        String objectName = "RMIVulnerabilityTestObject";        // Connect to the RMI registry on the target system        Registry registry = LocateRegistry.getRegistry(targetIp, targetPort);        // Get the remote object from the registry        Object remoteObject = registry.lookup(objectName);        // Cast the remote object to a vulnerable classloader object        ClassLoaderObject clobj = (ClassLoaderObject) UnicastRemoteObject.toStub((Remote) remoteObject);        // Load a class using the vulnerable classloader        clobj.loadClass("java.lang.Runtime");        System.out.println("The RMI service is vulnerable to the RMI Classloader Vulnerability!");    } }
+
+Replace the "TARGET_IP_ADDRESS" and "TARGET_PORT_NUMBER" placeholders in the code with the actual IP address and port number of the target RMI service.
+
+Compile the Java file using the following command:
+
+Copy code
+
+javac RMIVulnerabilityChecker.java
+
+Run the compiled Java program using the following command:
+
+javascriptCopy code
+
+java -Djava.rmi.server.useCodebaseOnly=false -Djava.security.policy=/path/to/java.policy RMIVulnerabilityChecker
+
+Here, replace "/path/to/java.policy" with the actual path to a Java policy file that allows the code to execute remote code. If you don't have a policy file, you can create one with the following content:
+
+markdownCopy code
+
+grant {    permission java.security.AllPermission; };
+
+If the RMI service is vulnerable to the RMI Classloader Vulnerability, the program will print the message "The RMI service is vulnerable to the RMI Classloader Vulnerability!" to the console.
